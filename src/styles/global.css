@@ -1,0 +1,441 @@
+@import "tailwindcss";
+@import "./typography.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* COLOR SCHEME */
+.dark {
+  --background: var(--color-zinc-800);
+  --foreground: var(--color-zinc-300);
+  --accent: var(--color-yellow-500);
+}
+
+.light {
+  --background: var(--color-gray-100);
+  --foreground: var(--color-gray-800);
+  --accent: var(--color-red-500);
+}
+
+/* CODE BLOCK - Shiki dual theme support */
+.light {
+  .astro-code,
+  .astro-code span {
+    color: var(--shiki-light) !important;
+    background-color: var(--shiki-light-bg) !important;
+  }
+}
+.dark {
+  .astro-code,
+  .astro-code span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
+}
+
+/* INIT TAILWIND THEME */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+
+  --font-sans: "Space Grotesk Variable";
+  --font-mono: "IBM Plex Mono";
+}
+
+/* BASE STYLING */
+@layer base {
+  /* layouts */
+  html {
+    @apply bg-background text-foreground selection:bg-accent selection:text-background overflow-y-scroll scroll-smooth antialiased;
+  }
+  body {
+    --z-old: 1;
+    --z-new: 2;
+  }
+  .dark {
+    --z-old: 2;
+    --z-new: 1;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* SCROLLBAR STYLING */
+@layer base {
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-foreground);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-accent);
+  }
+}
+
+/* THEME TRANSITION */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: var(--z-old);
+}
+::view-transition-new(root) {
+  z-index: var(--z-new);
+}
+
+/* ============================================
+   WORDPRESS CONTENT STYLES
+   ============================================ */
+
+/* WordPress post content image styling */
+.markdown img,
+.wordpress-content img {
+  @apply rounded-lg mb-6;
+}
+
+/* Ensure featured images also have consistent styling */
+figure img {
+  @apply rounded-lg;
+}
+
+/* WordPress button styles - Custom design with animated border */
+.wp-block-button {
+  @apply inline-block my-2 relative;
+}
+
+.wp-block-button::before {
+  content: "";
+  @apply absolute -top-0.5 -left-0.5 -right-0.5 -bottom-0.5 rounded-3xl opacity-0 transition-opacity duration-300 z-10;
+  background: conic-gradient(from var(--border-angle), transparent, var(--color-accent), transparent);
+  animation: border-rotate 3s linear infinite;
+}
+
+.wp-block-button:hover::before {
+  @apply opacity-100;
+}
+
+.wp-block-button__link {
+  /* Base button styles */
+  @apply inline-block cursor-pointer rounded-3xl font-medium no-underline transition-all duration-300 border-0 relative z-20;
+  
+  /* Default sizing and padding */
+  @apply py-3 px-6 text-lg leading-6;
+  
+  /* Colors using theme variables */
+  @apply text-background bg-accent shadow-md;
+}
+
+.wp-block-button__link:hover {
+  /* Hover effects */
+  @apply -translate-y-0.5 brightness-110;
+}
+
+.wp-block-button__link:active {
+  @apply translate-y-0 shadow-sm;
+}
+
+.wp-block-button__link:focus {
+  @apply outline outline-2 outline-accent outline-offset-2;
+}
+
+.wp-block-button__link:disabled,
+.wp-block-button__link[aria-disabled="true"] {
+  @apply opacity-60 cursor-not-allowed translate-y-0 shadow-none;
+}
+
+/* Alternate color variants */
+.wp-block-button.is-style-outline .wp-block-button__link {
+  @apply bg-transparent border-2 border-accent text-accent;
+}
+
+.wp-block-button.is-style-outline .wp-block-button__link:hover {
+  @apply bg-accent/10;
+}
+
+/* Responsive styles */
+@media (max-width: 1280px) {
+  .wp-block-button__link {
+    @apply py-2.5 px-5 text-sm leading-5;
+  }
+}
+
+@media (max-width: 640px) {
+  .wp-block-button__link {
+    @apply py-2 px-4 text-xs leading-4;
+  }
+}
+
+/* Big button variant */
+.wp-block-button.is-style-big .wp-block-button__link,
+.wp-block-button.is-style-fill .wp-block-button__link {
+  @apply py-4 px-8 text-lg font-semibold;
+}
+
+@media (max-width: 640px) {
+  .wp-block-button.is-style-big .wp-block-button__link,
+  .wp-block-button.is-style-fill .wp-block-button__link {
+    @apply py-3 px-6 text-base;
+  }
+}
+
+/* Ensure buttons inside content areas have appropriate spacing */
+.entry-content .wp-block-button {
+  @apply my-4;
+}
+
+.entry-content .wp-block-button:first-child {
+  @apply mt-0;
+}
+
+.entry-content .wp-block-button:last-child {
+  @apply mb-0;
+}
+
+/* Keyframes for the animated border */
+@keyframes border-rotate {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+/* Define the border angle property */
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* WordPress Gutenberg blocks additional styling */
+.wp-block-image {
+  @apply my-6;
+}
+
+.wp-block-image figcaption {
+  @apply text-center text-sm opacity-70 mt-2;
+}
+
+.wp-block-quote {
+  @apply bg-foreground/13 ring-accent text-foreground my-6 px-6 py-4 opacity-80 ring-1 rounded-lg;
+}
+
+.wp-block-code {
+  @apply my-8 rounded-lg overflow-x-auto;
+  background-color: var(--shiki-dark-bg, #24292e);
+  padding: 1.5rem;
+  border: 1px solid var(--color-accent);
+}
+
+.light .wp-block-code {
+  background-color: var(--shiki-light-bg, #ffffff);
+}
+
+.wp-block-code code {
+  @apply font-mono text-sm leading-relaxed;
+  color: var(--shiki-dark, #e1e4e8);
+  background: transparent;
+  padding: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.light .wp-block-code code {
+  color: var(--shiki-light, #0e1116);
+}
+
+.wp-block-separator {
+  @apply border-foreground/26 my-8;
+}
+
+.wp-block-table {
+  @apply mx-auto my-8 w-full opacity-90;
+}
+
+.wp-block-table th {
+  @apply bg-foreground/8 ring-foreground/18 px-3 py-1 text-center text-lg ring-1;
+}
+
+.wp-block-table td {
+  @apply ring-foreground/18 px-3 py-1 ring-1;
+}
+
+/* WordPress gallery */
+.wp-block-gallery {
+  @apply grid gap-4 my-6;
+}
+
+.wp-block-gallery.columns-2 {
+  @apply grid-cols-2;
+}
+
+.wp-block-gallery.columns-3 {
+  @apply grid-cols-3;
+}
+
+.wp-block-gallery.columns-4 {
+  @apply grid-cols-4;
+}
+
+/* WordPress embed blocks */
+.wp-block-embed {
+  @apply my-6;
+}
+
+.wp-block-embed__wrapper {
+  @apply relative aspect-video;
+}
+
+.wp-block-embed__wrapper iframe {
+  @apply absolute inset-0 w-full h-full;
+}
+
+/* ============================================
+   WORDPRESS CONTENT TYPOGRAPHY ENHANCEMENTS
+   ============================================ */
+
+/* WordPress content paragraph spacing */
+.wordpress-content p + p {
+  @apply mt-6;
+}
+
+/* WordPress content list spacing */
+.wordpress-content ul,
+.wordpress-content ol {
+  @apply my-4 space-y-2;
+}
+
+.wordpress-content li > ul,
+.wordpress-content li > ol {
+  @apply my-2;
+}
+
+/* WordPress content heading spacing */
+.wordpress-content h2 {
+  @apply mt-12 mb-4 text-4xl;
+}
+
+.wordpress-content h3 {
+  @apply mt-8 mb-3 text-3xl;
+}
+
+.wordpress-content h4 {
+  @apply mt-6 mb-2 text-2xl;
+}
+
+.wordpress-content h5 {
+  @apply mt-4 mb-2 text-xl;
+}
+
+/* WordPress preformatted text and code blocks */
+.wordpress-content pre,
+.wordpress-content .wp-block-code {
+  @apply my-8 rounded-lg overflow-x-auto;
+  background-color: var(--shiki-dark-bg, #24292e);
+  padding: 1.5rem;
+  border: 1px solid var(--color-accent);
+}
+
+.light .wordpress-content pre,
+.light .wordpress-content .wp-block-code {
+  background-color: var(--shiki-light-bg, #ffffff);
+}
+
+.wordpress-content pre code,
+.wordpress-content .wp-block-code code {
+  @apply font-mono text-sm leading-relaxed;
+  color: var(--shiki-dark, #e1e4e8);
+  background: transparent;
+  padding: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.light .wordpress-content pre code,
+.light .wordpress-content .wp-block-code code {
+  color: var(--shiki-light, #0e1116);
+}
+
+/* WordPress inline code */
+.wordpress-content code {
+  @apply bg-foreground/13 dark:bg-foreground/18 text-foreground rounded-lg px-2 py-0.5 font-mono text-base;
+}
+
+/* Ensure inline code inside pre doesn't get extra styling */
+.wordpress-content pre code {
+  @apply bg-transparent rounded-none px-0 py-0;
+}
+
+/* WordPress blockquote styling */
+.wordpress-content blockquote {
+  @apply bg-foreground/13 ring-accent text-foreground my-6 px-6 py-4 opacity-80 ring-1 rounded-lg;
+}
+
+.wordpress-content blockquote p {
+  @apply m-0;
+}
+
+/* WordPress horizontal rule */
+.wordpress-content hr {
+  @apply border-foreground/26 my-10;
+}
+
+/* WordPress table improvements */
+.wordpress-content table {
+  @apply my-8 w-full;
+}
+
+.wordpress-content th {
+  @apply bg-foreground/8 ring-foreground/18 px-4 py-2 text-center text-lg ring-1 font-semibold;
+}
+
+.wordpress-content td {
+  @apply ring-foreground/18 px-4 py-2 ring-1;
+}
+
+/* WordPress figure and image spacing */
+.wordpress-content figure {
+  @apply my-8;
+}
+
+.wordpress-content figure img {
+  @apply rounded-lg;
+}
+
+/* WordPress video blocks */
+.wp-block-video {
+  @apply my-8;
+}
+
+.wp-block-video video {
+  @apply w-full rounded-lg;
+}
+
+/* WordPress columns */
+.wp-block-columns {
+  @apply flex flex-wrap gap-6 my-6;
+}
+
+.wp-block-column {
+  @apply flex-1 min-w-0;
+}
+
+/* WordPress group blocks */
+.wp-block-group {
+  @apply my-6;
+}
+
+/* WordPress cover blocks */
+.wp-block-cover {
+  @apply my-8 rounded-lg overflow-hidden;
+}

@@ -1,0 +1,104 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getAllCategories, getPostsByCategorySlug, getCategoryMap, POSTS_PER_PAGE } from "../../../lib/wordpress";
+import WordPressPostCard from "../../../components/blog/WordPressPostCard.astro";
+import Pagination from "../../../components/ui/Pagination.astro";
+import type { WordPressCategory, WordPressPost } from "../../../lib/types";
+
+export async function getStaticPaths() {
+  const categories = await getAllCategories();
+  const paths = [];
+  
+  for (const category of categories) {
+    // Skip "Uncategorized" category if it exists
+    if (category.slug === 'uncategorized') continue;
+    
+    const { posts } = await getPostsByCategorySlug(category.slug, { 
+      per_page: 100, 
+      status: "publish" 
+    });
+    
+    // Sort posts by date (newest first)
+    posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
+    
+    // Generate paths for all pages
+    for (let page = 1; page <= Math.max(1, totalPages); page++) {
+      paths.push({
+        params: { 
+          slug: category.slug,
+          page: page === 1 ? undefined : String(page)
+        },
+        props: { 
+          category, 
+          allPosts: posts,
+          currentPage: page,
+          totalPages: Math.max(1, totalPages)
+        },
+      });
+    }
+  }
+  
+  return paths;
+}
+
+interface Props {
+  category: WordPressCategory;
+  allPosts: WordPressPost[];
+  currentPage: number;
+  totalPages: number;
+}
+
+const { category, allPosts, currentPage, totalPages } = Astro.props;
+const categoryMap = await getCategoryMap();
+
+// Paginate posts
+const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+const posts = allPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
+---
+
+<BaseLayout 
+  title={currentPage === 1 ? category.name : `${category.name} - Page ${currentPage}`}
+  description={category.description || `Browse all posts in the ${category.name} category`}
+>
+  <div class="center">
+    <h1 class="heading">{category.name}</h1>
+    {category.description && (
+      <p class="paragraph mb-8" set:html={category.description} />
+    )}
+    
+    <p class="text-sm text-foreground/60 mb-6">
+      {allPosts.length} post{allPosts.length !== 1 ? 's' : ''} in this category
+    </p>
+    
+    {posts.length === 0 ? (
+      <p class="text-center text-foreground/60 py-8">No posts found in this category.</p>
+    ) : (
+      <ul class="grid gap-3">
+        {posts.map((post) => (
+          <li>
+            <WordPressPostCard post={post} categoryMap={categoryMap} />
+          </li>
+        ))}
+      </ul>
+    )}
+    
+    {totalPages > 1 && (
+      <Pagination 
+        currentPage={currentPage}
+        totalPages={totalPages}
+        baseUrl={`/category/${category.slug}`}
+      />
+    )}
+    
+    <div class="mt-8 text-center">
+      <a 
+        href="/archive/"
+        class="text-accent hover:underline"
+      >
+        ← Back to all posts
+      </a>
+    </div>
+  </div>
+</BaseLayout>

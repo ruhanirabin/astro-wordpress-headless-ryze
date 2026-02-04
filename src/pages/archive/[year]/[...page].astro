@@ -1,0 +1,98 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getAllPosts, getCategoryMap, POSTS_PER_PAGE } from "../../../lib/wordpress";
+import WordPressPostCard from "../../../components/blog/WordPressPostCard.astro";
+import Pagination from "../../../components/ui/Pagination.astro";
+import YearFilter from "../../../components/blog/YearFilter.astro";
+import type { WordPressPost } from "../../../lib/types";
+
+export async function getStaticPaths() {
+  const allPosts = await getAllPosts();
+  const years = Array.from(
+    new Set(
+      allPosts.map((post) => new Date(post.date).getFullYear().toString())
+    )
+  ).sort((a, b) => Number(b) - Number(a));
+
+  const paths = [];
+
+  for (const year of years) {
+    const yearPosts = allPosts.filter(
+      (post) => new Date(post.date).getFullYear().toString() === year
+    );
+
+    const totalPages = Math.ceil(yearPosts.length / POSTS_PER_PAGE) || 1;
+
+    for (let page = 1; page <= totalPages; page++) {
+      const props = {
+        allPosts,
+        year,
+        currentPage: page,
+        totalPages,
+        years,
+      };
+
+      // Support both /archive/{year} and /archive/{year}/1
+      if (page === 1) {
+        paths.push({
+          params: { year, page: undefined },
+          props,
+        });
+      }
+
+      paths.push({
+        params: { year, page: String(page) },
+        props,
+      });
+    }
+  }
+
+  return paths;
+}
+
+interface Props {
+  allPosts: WordPressPost[];
+  year: string;
+  currentPage: number;
+  totalPages: number;
+  years: string[];
+}
+
+const { allPosts, year, currentPage, totalPages, years } = Astro.props;
+const categoryMap = await getCategoryMap();
+
+const filtered = allPosts
+  .filter((post) => new Date(post.date).getFullYear().toString() === year)
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+const posts = filtered.slice(startIndex, startIndex + POSTS_PER_PAGE);
+---
+
+<BaseLayout
+  title={`Archive - ${year}${currentPage === 1 ? "" : ` - Page ${currentPage}`}`}
+  description={`Posts from ${year}.`}
+>
+  <div class="center">
+    <div class="flex items-center gap-8">
+      <a href="/archive/" class="heading">Archive</a>
+      <YearFilter years={years} />
+    </div>
+
+    {posts.length === 0 ? (
+      <p class="text-center text-foreground/60 py-8">No posts found.</p>
+    ) : (
+      <ul class="my-3 space-y-3">
+        {posts.map((post) => (
+          <li>
+            <WordPressPostCard post={post} categoryMap={categoryMap} />
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {totalPages > 1 && (
+      <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={`/archive/${year}`} />
+    )}
+  </div>
+</BaseLayout>

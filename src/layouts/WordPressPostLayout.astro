@@ -1,0 +1,145 @@
+---
+import ProgressBar from "../components/ui/ProgressBar";
+import BaseLayout from "./BaseLayout.astro";
+import WordPressTitle from "../components/blog/WordPressTitle.astro";
+import type { WordPressCategory } from "../lib/types";
+
+interface Props {
+  title: string;
+  description: string;
+  date: string;
+  modifiedDate?: string;
+  readTime: number;
+  categories?: WordPressCategory[];
+  featuredImage?: {
+    url: string;
+    alt: string;
+    width?: number;
+    height?: number;
+    mimeType?: string;
+  } | null;
+}
+
+const { title, description, date, modifiedDate, readTime, categories, featuredImage } = Astro.props;
+
+// Extract category names for SEO
+const categoryNames = categories?.map(cat => cat.name) || [];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  url={Astro.url.href}
+  pubDate={new Date(date)}
+  modifiedDate={modifiedDate}
+  ogimage={featuredImage || undefined}
+  article={true}
+  categories={categoryNames}
+>
+  <Fragment slot="head">
+    <link
+      id="hljs-light"
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/atom-one-light.min.css"
+    />
+    <link
+      id="hljs-dark"
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/atom-one-dark.min.css"
+    />
+    <script is:inline>
+      const root = document.documentElement;
+      const lightLink = document.getElementById("hljs-light");
+      const darkLink = document.getElementById("hljs-dark");
+      const prefersDark = () =>
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const applyTheme = () => {
+        const isDark =
+          root.classList.contains("dark") ||
+          (!root.classList.contains("light") && prefersDark());
+        if (darkLink) darkLink.disabled = !isDark;
+        if (lightLink) lightLink.disabled = isDark;
+      };
+      applyTheme();
+      new MutationObserver(applyTheme).observe(root, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", applyTheme);
+    </script>
+    <script type="module">
+      import hljs from "https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/+esm";
+      hljs.highlightAll();
+    </script>
+    <style>
+      .code-copy {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        opacity: 0;
+        transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
+        transform: translateY(-2px);
+      }
+      pre:hover .code-copy,
+      pre:focus-within .code-copy {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    </style>
+  </Fragment>
+  <ProgressBar client:idle />
+  <article>
+    <div class="center">
+      <WordPressTitle {title} {date} {readTime} {categories} />
+      <section class="markdown wordpress-content">
+        <slot />
+      </section>
+    </div>
+  </article>
+</BaseLayout>
+
+<script type="module">
+  const preBlocks = Array.from(
+    document.querySelectorAll(".wordpress-content pre")
+  );
+
+  preBlocks.forEach((pre) => {
+    const code = pre.querySelector("code");
+    if (!code) return;
+
+    const text = code.textContent || "";
+    const lineCount = text.trim().split("\n").length;
+    if (lineCount < 2) return;
+
+    pre.style.position = "relative";
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className =
+      "code-copy inline-flex items-center justify-center size-9 rounded-md bg-background/80 ring-1 ring-foreground/20 text-foreground text-xs";
+    button.setAttribute("aria-label", "Copy code");
+    button.textContent = "Copy";
+    button.style.position = "absolute";
+    button.style.top = "0.75rem";
+    button.style.right = "0.75rem";
+
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(text);
+        button.textContent = "Copied";
+        setTimeout(() => {
+          button.textContent = "Copy";
+        }, 1200);
+      } catch {
+        button.textContent = "Failed";
+        setTimeout(() => {
+          button.textContent = "Copy";
+        }, 1200);
+      }
+    });
+
+    pre.appendChild(button);
+  });
+</script>

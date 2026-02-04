@@ -1,0 +1,22 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Introduction from "../components/portfolio/Introduction.astro";
+import WordPressFeatured from "../components/blog/WordPressFeatured.astro";
+---
+
+<BaseLayout
+  title="Ruhani Rabin's Technology Journal"
+  description="Exploring WordPress, Automation, Development, and Tech Insights."
+  author="Ruhani Rabin"
+  url={Astro.url.href}
+>
+  <div class="center">
+    <section>
+      <Introduction />
+    </section>
+    <hr />
+    <section>
+      <WordPressFeatured />
+    </section>
+  </div>
+</BaseLayout>

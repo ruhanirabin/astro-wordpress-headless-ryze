@@ -1,0 +1,17 @@
+---
+import { wp, getCategoryMap } from "../../lib/wordpress";
+import WordPressFeatureCard from "./WordPressFeatureCard.astro";
+
+const postsResponse = await wp.getPosts({ per_page: 4, status: "publish" });
+const posts = postsResponse.data || [];
+const categoryMap = await getCategoryMap();
+---
+
+<h2 class="section-heading">F E A T U R E D</h2>
+<ul class="grid gap-3 py-6 md:grid-cols-2">
+  {posts.map((post) => (
+    <li>
+      <WordPressFeatureCard post={post} categoryMap={categoryMap} />
+    </li>
+  ))}
+</ul>

@@ -1,0 +1,42 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+}
+
+const { currentPage, totalPages, baseUrl } = Astro.props;
+
+function getPageUrl(page: number): string {
+  // Normalize baseUrl - remove trailing slash
+  const normalizedBase = baseUrl.replace(/\/$/, "");
+  return page === 1 ? `${normalizedBase}/` : `${normalizedBase}/${page}/`;
+}
+
+const prevUrl = currentPage > 1 ? getPageUrl(currentPage - 1) : null;
+const nextUrl = currentPage < totalPages ? getPageUrl(currentPage + 1) : null;
+---
+
+<nav class="my-3 flex items-center justify-center gap-8 select-none" aria-label="Pagination">
+  <a
+    href={prevUrl || "#"}
+    class:list={[
+      prevUrl ? "hover:text-accent" : "text-foreground/60 cursor-not-allowed",
+    ]}
+    aria-label="Previous page"
+  >
+    prev
+  </a>
+  <p class="font-mono text-sm opacity-90">
+    {currentPage} of {totalPages}
+  </p>
+  <a
+    href={nextUrl || "#"}
+    class:list={[
+      nextUrl ? "hover:text-accent" : "text-foreground/60 cursor-not-allowed",
+    ]}
+    aria-label="Next page"
+  >
+    next
+  </a>
+</nav>

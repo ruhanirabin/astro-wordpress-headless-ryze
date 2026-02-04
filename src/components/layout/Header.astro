@@ -1,0 +1,42 @@
+---
+import ThemeToggle from "../ui/ThemeToggle";
+import SearchBox from "../ui/SearchBox";
+import Navigation from "./Navigation.astro";
+import IconRss from "../../assets/icons/rss.svg";
+import { getAllPosts, createSearchIndex } from "../../lib/wordpress";
+
+// Fetch posts and create search index at build time
+const posts = await getAllPosts();
+const searchIndex = await createSearchIndex(posts);
+---
+
+<header class="header-margin flex flex-col gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
+  <a
+    href="/"
+    class:list={[
+      "text-xl tracking-wider select-none w-full sm:w-auto py-2",
+      Astro.url.pathname === "/" ? "text-accent" : "",
+    ]}>rabin.blog</a
+  >
+  <div class="flex items-center justify-center gap-4 md:gap-6">
+    <Navigation />
+
+    <div class="flex items-center justify-center gap-3 md:gap-4">
+      <ThemeToggle client:idle />
+      <a
+        href="/rss.xml"
+        aria-label="rss"
+        title="rss"
+        class="inline-flex items-center justify-center size-11 rounded-md"
+      >
+        <IconRss class="active-foreground size-5" />
+      </a>
+    </div>
+  </div>
+  <div class="sm:hidden">
+    <SearchBox client:idle searchIndex={searchIndex} />
+  </div>
+  <div class="hidden sm:block">
+    <SearchBox client:idle searchIndex={searchIndex} />
+  </div>
+</header>

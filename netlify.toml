@@ -1,0 +1,197 @@
+[build]
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NPM_FLAGS = "--legacy-peer-deps"
+  NODE_ENV = "production"
+
+# Redirects for old WordPress URLs
+[[redirects]]
+  from = "/wp-admin/*"
+  to = "/admin/"
+  status = 301
+
+[[redirects]]
+  from = "/wp-content/*"
+  to = "/assets/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/feed"
+  to = "/rss.xml"
+  status = 301
+
+[[redirects]]
+  from = "/feed/"
+  to = "/rss.xml"
+  status = 301
+
+[[redirects]]
+  from = "/category/:category"
+  to = "/blog/category/:category"
+  status = 301
+
+[[redirects]]
+  from = "/tag/:tag"
+  to = "/blog/tag/:tag"
+  status = 301
+
+[[redirects]]
+  from = "/:year/:month/:day/:slug"
+  to = "/blog/:slug"
+  status = 301
+
+# Redirect legacy blog paths to archive
+[[redirects]]
+  from = "/blog/*"
+  to = "/archive/:splat"
+  status = 301
+
+# SPA fallback for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com; frame-ancestors 'none';"
+
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache images
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.jpeg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.avif"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache fonts
+[[headers]]
+  for = "*.woff"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache CSS and JS
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# HTML caching
+[[headers]]
+  for = "*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+# API routes (if any)
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# Forms configuration
+[forms]
+  # Enable Netlify Forms
+  
+# Functions configuration (if using Netlify Functions)
+# [functions]
+#   directory = "netlify/functions"
+
+# Plugin configuration
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+  
+  [plugins.inputs.thresholds]
+    performance = 0.9
+    accessibility = 0.9
+    best-practices = 0.9
+    seo = 0.9
+
+[[plugins]]
+  package = "netlify-plugin-submit-sitemap"
+  
+  [plugins.inputs]
+    baseUrl = "$SITE_URL"
+    sitemapPath = "/sitemap.xml"
+    ignorePeriod = 0
+    providers = [
+      "google",
+      "bing"
+    ]
+
+# Build context-specific settings
+[context.production]
+  command = "npm install && npm run build && cp -r public/wp-images dist/wp-images 2>/dev/null || true"
+  
+[context.production.environment]
+  NODE_ENV = "production"
+
+[context.deploy-preview]
+  command = "npm ci && npm run build"
+  
+[context.deploy-preview.environment]
+  NODE_ENV = "preview"
+
+[context.branch-deploy]
+  command = "npm ci && npm run build"
+  
+[context.branch-deploy.environment]
+  NODE_ENV = "development"
+
+# Edge functions (if using)
+# [[edge_functions]]
+#   path = "/api/example"
+#   function = "example"

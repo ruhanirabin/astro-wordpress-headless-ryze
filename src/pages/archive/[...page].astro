@@ -1,0 +1,82 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getAllPosts, getCategoryMap, POSTS_PER_PAGE } from "../../lib/wordpress";
+import WordPressPostCard from "../../components/blog/WordPressPostCard.astro";
+import Pagination from "../../components/ui/Pagination.astro";
+import YearFilter from "../../components/blog/YearFilter.astro";
+import type { WordPressPost } from "../../lib/types";
+
+export async function getStaticPaths() {
+  const allPosts = await getAllPosts();
+  const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE) || 1;
+
+  // Sort posts by date (newest first)
+  allPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  // Collect years for filter
+  const years = Array.from(
+    new Set(allPosts.map((post) => new Date(post.date).getFullYear().toString()))
+  ).sort((a, b) => Number(b) - Number(a));
+
+  const paths = [];
+
+  for (let page = 1; page <= totalPages; page++) {
+    const props = {
+      allPosts,
+      currentPage: page,
+      totalPages,
+      years,
+    };
+
+    // Support both /archive and /archive/1
+    if (page === 1) {
+      paths.push({ params: { page: undefined }, props });
+    }
+
+    paths.push({ params: { page: String(page) }, props });
+  }
+
+  return paths;
+}
+
+interface Props {
+  allPosts: WordPressPost[];
+  currentPage: number;
+  totalPages: number;
+  years: string[];
+}
+
+const { allPosts, currentPage, totalPages, years } = Astro.props;
+const categoryMap = await getCategoryMap();
+
+const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+const posts = allPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
+---
+
+<BaseLayout
+  title={currentPage === 1 ? "Archive" : `Archive - Page ${currentPage}`}
+  description="All posts, newest first."
+>
+  <div class="center">
+    <div class="flex items-center gap-8">
+      <a href="/archive/" class="heading">Archive</a>
+      <YearFilter years={years} />
+    </div>
+
+    {posts.length === 0 ? (
+      <p class="text-center text-foreground/60 py-8">No posts found.</p>
+    ) : (
+      <ul class="my-3 space-y-3">
+        {posts.map((post) => (
+          <li>
+            <WordPressPostCard post={post} categoryMap={categoryMap} />
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {totalPages > 1 && (
+      <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl="/archive" />
+    )}
+  </div>
+</BaseLayout>

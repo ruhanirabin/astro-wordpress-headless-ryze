@@ -1,0 +1,22 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+const { frontmatter } = Astro.props;
+---
+
+<BaseLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+>
+  <div class="center">
+    <article class="py-8">
+      <header class="mb-8">
+        <h1 class="heading">{frontmatter.title}</h1>
+      </header>
+      
+      <div class="markdown">
+        <slot />
+      </div>
+    </article>
+  </div>
+</BaseLayout>

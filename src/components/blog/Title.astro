@@ -1,0 +1,52 @@
+---
+import IconCalendar from "../../assets/icons/calendar-week.svg";
+import IconClock from "../../assets/icons/clock-hour-3.svg";
+import IconTag from "../../assets/icons/tag.svg";
+
+interface Props {
+  frontmatter: {
+    title: string;
+    date?: Date;
+    tags?: string[];
+  };
+  readTime?: number;
+}
+
+const { frontmatter, readTime } = Astro.props;
+
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+---
+
+<header class="py-6">
+  <h1 class="blog-title">{frontmatter.title}</h1>
+  <div class="flex flex-wrap items-center gap-4 text-sm opacity-80">
+    {frontmatter.date && (
+      <div class="flex items-center gap-2">
+        <IconCalendar class="size-4" />
+        <time datetime={frontmatter.date.toISOString()}>
+          {formatDate(frontmatter.date)}
+        </time>
+      </div>
+    )}
+    {readTime && (
+      <div class="flex items-center gap-2">
+        <IconClock class="size-4" />
+        <span>{readTime} min read</span>
+      </div>
+    )}
+  </div>
+  {frontmatter.tags && frontmatter.tags.length > 0 && (
+    <div class="mt-4 flex flex-wrap items-center gap-2">
+      <IconTag class="size-4 opacity-60" />
+      {frontmatter.tags.map((tag) => (
+        <span class="ring-accent rounded-lg px-3 py-1 text-sm ring-1">{tag}</span>
+      ))}
+    </div>
+  )}
+</header>

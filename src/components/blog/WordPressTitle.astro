@@ -1,0 +1,43 @@
+---
+import { formatDate } from "../../lib/utils";
+import type { WordPressCategory } from "../../lib/types";
+import IconCalendar from "../../assets/icons/calendar-week.svg";
+import IconClock from "../../assets/icons/clock-hour-3.svg";
+import IconTag from "../../assets/icons/tag.svg";
+
+interface Props {
+  title: string;
+  date: string;
+  readTime: number;
+  categories?: WordPressCategory[];
+}
+
+const { title, date, readTime, categories } = Astro.props;
+---
+
+<header class="py-6">
+  <h1 class="blog-title" set:html={title} />
+  <div class="flex flex-wrap items-center gap-4 text-sm opacity-80">
+    <div class="flex items-center gap-2">
+      <IconCalendar class="size-4" />
+      <time datetime={date}>{formatDate(date)}</time>
+    </div>
+    <div class="flex items-center gap-2">
+      <IconClock class="size-4" />
+      <span>{readTime} min read</span>
+    </div>
+  </div>
+  {categories && categories.length > 0 && (
+    <div class="mt-4 flex flex-wrap items-center gap-2">
+      <IconTag class="size-4 opacity-60" />
+      {categories.map((cat) => (
+        <a 
+          href={`/category/${cat.slug}/`}
+          class="ring-accent hover:bg-accent hover:text-background rounded-lg px-3 py-1 text-sm ring-1 transition-colors"
+        >
+          {cat.name}
+        </a>
+      ))}
+    </div>
+  )}
+</header>

@@ -1,0 +1,63 @@
+---
+import WordPressPostLayout from "../layouts/WordPressPostLayout.astro";
+import { wp, getCategoryMap, resolvePostCategories, getFeaturedImage, type FeaturedImage } from "../lib/wordpress";
+import { getReadingTime } from "../lib/utils";
+import { processContentImages } from "../lib/image-processor";
+import type { WordPressPost, WordPressCategory } from "../lib/types";
+
+export async function getStaticPaths() {
+  const postsResponse = await wp.getPosts({ per_page: 100, status: "publish" });
+  const posts: WordPressPost[] = postsResponse.data || [];
+  const categoryMap = await getCategoryMap();
+
+  // Process images and fetch featured images for all posts at build time
+  const processedPosts = await Promise.all(
+    posts.map(async (post) => {
+      const processedContent = await processContentImages(post.content.rendered);
+      const categories = resolvePostCategories(post, categoryMap);
+      const featuredImage = await getFeaturedImage(post.featured_media);
+      
+      return {
+        ...post,
+        content: {
+          ...post.content,
+          rendered: processedContent,
+        },
+        resolvedCategories: categories,
+        featuredImage,
+      };
+    })
+  );
+
+  return processedPosts.map((post) => ({
+    params: { slug: post.slug },
+    props: { 
+      post, 
+      categories: post.resolvedCategories,
+      featuredImage: post.featuredImage,
+    },
+  }));
+}
+
+interface Props {
+  post: WordPressPost;
+  categories: WordPressCategory[];
+  featuredImage: FeaturedImage | null;
+}
+
+const { post, categories, featuredImage } = Astro.props;
+const readTime = getReadingTime(post.content.rendered);
+const description = post.excerpt.rendered.replace(/<[^>]*>/g, "").substring(0, 160);
+---
+
+<WordPressPostLayout
+  title={post.title.rendered}
+  description={description}
+  date={post.date}
+  modifiedDate={post.modified}
+  readTime={readTime}
+  categories={categories}
+  featuredImage={featuredImage}
+>
+  <div set:html={post.content.rendered} />
+</WordPressPostLayout>

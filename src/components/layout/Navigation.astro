@@ -1,0 +1,20 @@
+---
+
+---
+
+<nav class="flex items-center justify-center gap-4">
+  <a
+    href="/archive/"
+    class:list={[
+      "navigation animation",
+      Astro.url.pathname.startsWith("/archive") ? "text-accent" : "",
+    ]}>archive</a
+  >
+  <a
+    href="/about-me"
+    class:list={[
+      "navigation animation",
+      Astro.url.pathname.startsWith("/about") ? "text-accent" : "",
+    ]}>about</a
+  >
+</nav>
