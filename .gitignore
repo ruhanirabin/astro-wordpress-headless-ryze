@@ -27,5 +27,3 @@ pnpm-debug.log*
 .idea/
 tmp-ryze/
 tmp-ryze/*
-oss/*
-oss/
