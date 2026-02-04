@@ -8,7 +8,12 @@ import Socials from "../ui/Socials.astro";
   <div
     class="text-foreground/50 flex items-center justify-between text-sm select-none"
   >
-    <p>© {siteConfig.copyrightText} {siteConfig.author}</p>
+    <p>© {siteConfig.copyrightText} <a
+        href="https://www.ruhanirabin.com"
+        target="blank"
+        class="hover:text-accent"
+        aria-label="astro site">{siteConfig.author}</a
+      ></p>
     <p>
       powered by <a
         href="https://astro.build"
