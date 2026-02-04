@@ -24,6 +24,8 @@ const { title, description, date, modifiedDate, readTime, categories, featuredIm
 
 // Extract category names for SEO
 const categoryNames = categories?.map(cat => cat.name) || [];
+
+ 
 ---
 
 <BaseLayout
@@ -48,26 +50,28 @@ const categoryNames = categories?.map(cat => cat.name) || [];
       href="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/atom-one-dark.min.css"
     />
     <script is:inline>
-      const root = document.documentElement;
-      const lightLink = document.getElementById("hljs-light");
-      const darkLink = document.getElementById("hljs-dark");
-      const prefersDark = () =>
-        window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const applyTheme = () => {
-        const isDark =
-          root.classList.contains("dark") ||
-          (!root.classList.contains("light") && prefersDark());
-        if (darkLink) darkLink.disabled = !isDark;
-        if (lightLink) lightLink.disabled = isDark;
-      };
-      applyTheme();
-      new MutationObserver(applyTheme).observe(root, {
-        attributes: true,
-        attributeFilter: ["class"],
-      });
-      window
-        .matchMedia("(prefers-color-scheme: dark)")
-        .addEventListener("change", applyTheme);
+      (() => {
+        const root = document.documentElement;
+        const lightLink = document.getElementById("hljs-light");
+        const darkLink = document.getElementById("hljs-dark");
+        const prefersDarkMode = () =>
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const applyTheme = () => {
+          const isDark =
+            root.classList.contains("dark") ||
+            (!root.classList.contains("light") && prefersDarkMode());
+          if (darkLink) darkLink.disabled = !isDark;
+          if (lightLink) lightLink.disabled = isDark;
+        };
+        applyTheme();
+        new MutationObserver(applyTheme).observe(root, {
+          attributes: true,
+          attributeFilter: ["class"],
+        });
+        window
+          .matchMedia("(prefers-color-scheme: dark)")
+          .addEventListener("change", applyTheme);
+      })();
     </script>
     <script type="module">
       import hljs from "https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/+esm";

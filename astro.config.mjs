@@ -13,6 +13,9 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss(), vitePluginSvgr({})],
+    build: {
+      assetsInlineLimit: 0,
+    },
   },
 
   devToolbar: {
