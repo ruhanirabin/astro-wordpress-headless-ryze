@@ -2,6 +2,13 @@
 
 A modern, reader‑friendly Astro starter that uses **WordPress as a headless CMS**. It’s based on the [Ryze Astro theme](https://github.com/8366888C/Ryze), adapted for WordPress content and optimized for speed, accessibility, and SEO.
 
+## Live Preview
+[![Netlify Status](https://api.netlify.com/api/v1/badges/cb3a9c58-78ed-4aa1-affb-a61e07aabad2/deploy-status)](https://app.netlify.com/projects/rabin-blog-astro/deploys)
+[Rabin.blog](https://rabin.blog)
+
+Deploy your own with Netlify:
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/ruhanirabin/astro-wordpress-headless-ryze/)
+
 ## Features
 
 - Headless WordPress via REST API
