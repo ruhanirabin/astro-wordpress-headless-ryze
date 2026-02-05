@@ -5,7 +5,7 @@ A modern, reader‑friendly Astro starter that uses **WordPress as a headless CM
 ## Live Preview
 [![Netlify Status](https://api.netlify.com/api/v1/badges/cb3a9c58-78ed-4aa1-affb-a61e07aabad2/deploy-status)](https://rabin.blog)
 
-![Rabin.blog](https://rabin.blog)
+[Rabin.blog](https://rabin.blog)
 
 Deploy your own with Netlify:
 
