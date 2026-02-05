@@ -32,18 +32,18 @@ export async function getStaticPaths() {
         years,
       };
 
-      // Support both /archive/{year} and /archive/{year}/1
+      // Use /archive/{year} for page 1 (avoid duplicate /archive/{year}/1)
       if (page === 1) {
         paths.push({
           params: { year, page: undefined },
           props,
         });
+      } else {
+        paths.push({
+          params: { year, page: String(page) },
+          props,
+        });
       }
-
-      paths.push({
-        params: { year, page: String(page) },
-        props,
-      });
     }
   }
 

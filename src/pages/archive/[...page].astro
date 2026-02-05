@@ -28,12 +28,12 @@ export async function getStaticPaths() {
       years,
     };
 
-    // Support both /archive and /archive/1
+    // Use /archive for page 1 (avoid duplicate /archive/1)
     if (page === 1) {
       paths.push({ params: { page: undefined }, props });
+    } else {
+      paths.push({ params: { page: String(page) }, props });
     }
-
-    paths.push({ params: { page: String(page) }, props });
   }
 
   return paths;
