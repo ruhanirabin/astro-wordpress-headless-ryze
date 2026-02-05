@@ -1,6 +1,6 @@
 # Astro Headless WordPress (Ryze-theme)
 
-A modern, reader‑friendly Astro starter that uses **WordPress as a headless CMS**. It’s based on the ![Ryze Astro theme](https://github.com/8366888C/Ryze), adapted for WordPress content and optimized for speed, accessibility, and SEO.
+A modern, reader‑friendly Astro starter that uses **WordPress as a headless CMS**. It’s based on the [Ryze Astro theme](https://github.com/8366888C/Ryze), adapted for WordPress content and optimized for speed, accessibility, and SEO.
 
 ## Live Preview
 [![Netlify Status](https://api.netlify.com/api/v1/badges/cb3a9c58-78ed-4aa1-affb-a61e07aabad2/deploy-status)](https://rabin.blog)
