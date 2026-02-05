@@ -39,7 +39,7 @@
   --color-accent: var(--accent);
 
   --font-sans: "Space Grotesk Variable";
-  --font-mono: "IBM Plex Mono";
+  --font-mono: "JetBrains Mono", "IBM Plex Mono";
 }
 
 /* BASE STYLING */

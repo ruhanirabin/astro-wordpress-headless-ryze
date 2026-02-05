@@ -1,11 +1,11 @@
-# Astro Headless WordPress (Ryze-based)
+# Astro Headless WordPress (Ryze-theme)
 
-A modern, reader‑friendly Astro starter that uses **WordPress as a headless CMS**. It’s based on the [Ryze Astro theme](https://github.com/8366888C/Ryze), adapted for WordPress content and optimized for speed, accessibility, and SEO.
+A modern, reader‑friendly Astro starter that uses **WordPress as a headless CMS**. It’s based on the ![Ryze Astro theme](https://github.com/8366888C/Ryze), adapted for WordPress content and optimized for speed, accessibility, and SEO.
 
 ## Live Preview
 [![Netlify Status](https://api.netlify.com/api/v1/badges/cb3a9c58-78ed-4aa1-affb-a61e07aabad2/deploy-status)](https://rabin.blog)
 
-[Rabin.blog](https://rabin.blog)
+![Rabin.blog](https://rabin.blog)
 
 Deploy your own with Netlify:
 
@@ -14,15 +14,18 @@ Deploy your own with Netlify:
 ## Features
 
 - Headless WordPress via REST API
+- WordPress featured image support for open graph tags
+- WordPress images pulled and cached locally so if WordPress goes down, images and content are still available
 - Static site generation with Astro
 - Archive with year filter + pagination
 - Category listings
 - Featured posts section
 - Fuse.js client‑side search
-- Highlight.js for code syntax highlighting for both dark and light themes
-- Dark/light theme toggle
-- RSS + sitemap generation
+- Highlight.js for code syntax highlighting for both dark and light themes - uses JetBrains Mono for PRE/Code font
+- Dark/light theme toggle and also supports syntax highlighting
+- RSS + sitemap generation - no duplicate pages
 - Tailwind CSS v4 styling
+- Posts only, pages are manually managed via page-name.md
   
 ## Performance
 
@@ -58,8 +61,9 @@ astro-headless/
 
 ## Requirements
 
-- Node.js 20+ (22 recommended)
-- A WordPress site with REST API enabled
+- Node.js 20+ (22 strongly recommended)
+- A WordPress site online - with REST API enabled. 
+- This site does not need to be on a high powered server. You can use a low cost VPS or shared cPanel hosting.
 
 ## Quick Start
 
@@ -161,4 +165,4 @@ You can use the code snippet below to trigger a rebuild when WordPress content c
 
 ## Credits
 
-Based on the Ryze theme layout and styling, adapted for WordPress headless content.
+Based on the Ryze theme layout and styling, Powered by AstroJS - adapted for WordPress headless content.
