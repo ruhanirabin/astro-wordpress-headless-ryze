@@ -17,3 +17,5 @@ I work with founders and product leaders who are building real products under re
 [Shortlinks](https://be.ruhanirabin.com)
 
 [Contact](https://www.ruhanirabin.com/contact)
+
+![Ruhani Rabin Caricature](../../public/images/ruhani-rabin-caricature.webp)

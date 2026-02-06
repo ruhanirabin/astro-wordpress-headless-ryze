@@ -1,7 +1,7 @@
 ---
 import WordPressPostLayout from "../layouts/WordPressPostLayout.astro";
 import { wp, getCategoryMap, resolvePostCategories, getFeaturedImage, type FeaturedImage } from "../lib/wordpress";
-import { getReadingTime } from "../lib/utils";
+import { getReadingTime, decodeHtmlEntities } from "../lib/utils";
 import { processContentImages } from "../lib/image-processor";
 import type { WordPressPost, WordPressCategory } from "../lib/types";
 
@@ -29,23 +29,76 @@ export async function getStaticPaths() {
     })
   );
 
-  return processedPosts.map((post) => ({
-    params: { slug: post.slug },
-    props: { 
-      post, 
-      categories: post.resolvedCategories,
-      featuredImage: post.featuredImage,
-    },
-  }));
+  const sortedPosts = [...processedPosts].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+  const indexById = new Map(sortedPosts.map((post, index) => [post.id, index]));
+
+  return processedPosts.map((post) => {
+    const currentIndex = indexById.get(post.id) ?? -1;
+    const previousPost = currentIndex >= 0 ? sortedPosts[currentIndex + 1] : undefined;
+    const nextPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : undefined;
+    const currentCategoryIds = new Set(post.resolvedCategories.map((cat) => cat.id));
+    const relatedPosts = sortedPosts
+      .filter((candidate) => candidate.id !== post.id)
+      .map((candidate) => {
+        const sharedCount = candidate.resolvedCategories.reduce(
+          (count, cat) => count + (currentCategoryIds.has(cat.id) ? 1 : 0),
+          0
+        );
+        return { candidate, sharedCount };
+      })
+      .filter(({ sharedCount }) => sharedCount > 0)
+      .sort((a, b) => {
+        if (b.sharedCount !== a.sharedCount) return b.sharedCount - a.sharedCount;
+        return new Date(b.candidate.date).getTime() - new Date(a.candidate.date).getTime();
+      })
+      .slice(0, 3)
+      .map(({ candidate }) => ({
+        title: decodeHtmlEntities(
+          candidate.title.rendered.replace(/<[^>]*>/g, "")
+        ),
+        slug: candidate.slug,
+      }));
+
+    return {
+      params: { slug: post.slug },
+      props: {
+        post,
+        categories: post.resolvedCategories,
+        featuredImage: post.featuredImage,
+        relatedPosts,
+        previousPost: previousPost
+          ? {
+              title: decodeHtmlEntities(
+                previousPost.title.rendered.replace(/<[^>]*>/g, "")
+              ),
+              slug: previousPost.slug,
+            }
+          : null,
+        nextPost: nextPost
+          ? {
+              title: decodeHtmlEntities(
+                nextPost.title.rendered.replace(/<[^>]*>/g, "")
+              ),
+              slug: nextPost.slug,
+            }
+          : null,
+      },
+    };
+  });
 }
 
 interface Props {
   post: WordPressPost;
   categories: WordPressCategory[];
   featuredImage: FeaturedImage | null;
+  relatedPosts?: { title: string; slug: string }[];
+  previousPost?: { title: string; slug: string } | null;
+  nextPost?: { title: string; slug: string } | null;
 }
 
-const { post, categories, featuredImage } = Astro.props;
+const { post, categories, featuredImage, relatedPosts, previousPost, nextPost } = Astro.props;
 const readTime = getReadingTime(post.content.rendered);
 const description = post.excerpt.rendered.replace(/<[^>]*>/g, "").substring(0, 160);
 ---
@@ -58,6 +111,9 @@ const description = post.excerpt.rendered.replace(/<[^>]*>/g, "").substring(0, 1
   readTime={readTime}
   categories={categories}
   featuredImage={featuredImage}
+  relatedPosts={relatedPosts}
+  previousPost={previousPost}
+  nextPost={nextPost}
 >
   <div set:html={post.content.rendered} />
 </WordPressPostLayout>

@@ -25,6 +25,21 @@
   .navigation {
     @apply hover:text-accent text-base tracking-wider select-none px-2 py-2;
   }
+  .nav-dropdown {
+    @apply relative;
+  }
+  .nav-summary {
+    @apply hover:text-accent text-base tracking-wider select-none px-2 py-2 transition-all duration-150 ease-in-out cursor-pointer;
+    list-style: none;
+  }
+  .nav-panel {
+    @apply absolute left-1/2 z-20 mt-2 min-w-40 -translate-x-1/2 rounded-lg bg-background p-2 ring-1 ring-foreground/20 shadow-lg;
+    @apply flex flex-col gap-1;
+    display: none;
+  }
+  .nav-link {
+    @apply block rounded-md px-3 py-2 text-sm tracking-wider hover:text-accent;
+  }
 
   /* button */
   .button {
@@ -69,6 +84,24 @@
   .active-foreground {
     @apply stroke-foreground hover:stroke-accent transition-colors duration-150;
   }
+  .code-copy-active {
+    @apply bg-accent text-background ring-accent;
+  }
+  .code-copy-text {
+    @apply text-xs ml-2;
+  }
+  .back-to-top {
+    @apply fixed bottom-5 right-5 z-40 inline-flex items-center justify-center size-11 rounded-full ring-1 ring-foreground/20 bg-background text-foreground shadow-lg;
+    @apply opacity-0 pointer-events-none transition-all duration-150 ease-in-out;
+    transform: translateY(8px);
+  }
+  .back-to-top.is-visible {
+    @apply opacity-100 pointer-events-auto;
+    transform: translateY(0);
+  }
+  .back-to-top:hover {
+    @apply text-accent;
+  }
 
   /* socials */
   .socials {
@@ -78,6 +111,103 @@
   /* divider */
   hr {
     @apply border-foreground/26 m-13;
+  }
+}
+
+@layer base {
+  .nav-dropdown[open] .nav-panel {
+    display: flex;
+  }
+  .nav-dropdown > .nav-summary::-webkit-details-marker {
+    display: none;
+  }
+  @media (max-width: 640px) {
+    .nav-panel {
+      @apply static mt-1 min-w-0 w-full -translate-x-0;
+    }
+    .mobile-menu-nav {
+      @apply flex-col items-stretch gap-3 text-center;
+    }
+    .mobile-menu-nav .nav-summary {
+      @apply flex items-center justify-between gap-2 px-3;
+    }
+    .mobile-menu-nav .nav-summary::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      transition: transform 150ms ease-in-out;
+    }
+    .mobile-menu-nav .nav-dropdown[open] > .nav-summary::after {
+      transform: rotate(-135deg);
+    }
+  }
+}
+
+@layer base {
+  .mobile-menu-button {
+    @apply inline-flex h-10 w-10 flex-col items-center justify-center gap-1 rounded-md ring-1 ring-foreground/20;
+  }
+  .mobile-menu-bar {
+    @apply block h-0.5 w-5 bg-foreground;
+  }
+  .mobile-menu-bar + .mobile-menu-bar {
+    @apply mt-1;
+  }
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.32);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 150ms ease-in-out;
+    z-index: 40;
+  }
+  .mobile-menu-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: min(85vw, 340px);
+    background: var(--background);
+    padding: 16px;
+    box-shadow: -12px 0 24px rgba(0, 0, 0, 0.12);
+    transform: translateX(100%);
+    transition: transform 200ms ease-in-out;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .mobile-menu.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .mobile-menu.is-open .mobile-menu-panel {
+    transform: translateX(0);
+  }
+  .mobile-menu-close {
+    @apply text-sm tracking-wider px-3 py-1 rounded-md ring-1 ring-foreground/20;
+  }
+  .year-select {
+    @apply rounded-lg px-3 py-2 text-sm tracking-wider ring-1 ring-foreground/20 bg-background text-foreground;
+    @apply focus:outline-none focus:ring-2 focus:ring-accent;
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 14px) calc(50% - 2px), calc(100% - 9px) calc(50% - 2px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 2.25rem;
+  }
+  body.menu-open {
+    overflow: hidden;
+  }
+  @media (min-width: 641px) {
+    .mobile-menu {
+      display: none;
+    }
   }
 }
 

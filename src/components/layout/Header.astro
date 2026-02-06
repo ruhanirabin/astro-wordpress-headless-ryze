@@ -11,14 +11,28 @@ const searchIndex = await createSearchIndex(posts);
 ---
 
 <header class="header-margin flex flex-col gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
-  <a
-    href="/"
-    class:list={[
-      "text-xl tracking-wider select-none w-full sm:w-auto py-2",
-      Astro.url.pathname === "/" ? "text-accent" : "",
-    ]}>rabin.blog</a
-  >
-  <div class="flex items-center justify-center gap-4 md:gap-6">
+  <div class="flex items-center justify-between sm:block">
+    <a
+      href="/"
+      class:list={[
+        "text-xl tracking-wider select-none w-full sm:w-auto py-2",
+        Astro.url.pathname === "/" ? "text-accent" : "",
+      ]}>rabin.blog</a
+    >
+    <button
+      class="mobile-menu-button sm:hidden"
+      type="button"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <span class="mobile-menu-bar"></span>
+      <span class="mobile-menu-bar"></span>
+      <span class="mobile-menu-bar"></span>
+    </button>
+  </div>
+
+  <div class="hidden sm:flex items-center justify-center gap-4 md:gap-6">
     <Navigation />
 
     <div class="flex items-center justify-center gap-3 md:gap-4">
@@ -33,10 +47,53 @@ const searchIndex = await createSearchIndex(posts);
       </a>
     </div>
   </div>
-  <div class="sm:hidden">
-    <SearchBox client:idle searchIndex={searchIndex} />
-  </div>
   <div class="hidden sm:block">
     <SearchBox client:idle searchIndex={searchIndex} />
   </div>
+
+  <div class="mobile-menu sm:hidden" id="mobile-menu" aria-hidden="true">
+    <div class="mobile-menu-panel">
+      <div class="flex items-center justify-end">
+        <button class="mobile-menu-close" type="button" aria-label="Close menu">close</button>
+      </div>
+      <Navigation />
+      <div class="flex items-center justify-center gap-3 mt-4">
+        <ThemeToggle client:idle />
+        <a
+          href="/rss.xml"
+          aria-label="rss"
+          title="rss"
+          class="inline-flex items-center justify-center size-11 rounded-md"
+        >
+          <IconRss class="active-foreground size-5" />
+        </a>
+      </div>
+      <div class="mt-4">
+        <SearchBox client:idle searchIndex={searchIndex} />
+      </div>
+    </div>
+  </div>
 </header>
+
+<script is:inline>
+  const body = document.body;
+  const menu = document.getElementById('mobile-menu');
+  const openButton = document.querySelector('.mobile-menu-button');
+  const closeButton = document.querySelector('.mobile-menu-close');
+
+  const setMenuState = (isOpen) => {
+    menu?.classList.toggle('is-open', isOpen);
+    body.classList.toggle('menu-open', isOpen);
+    if (openButton) openButton.setAttribute('aria-expanded', String(isOpen));
+    if (menu) menu.setAttribute('aria-hidden', String(!isOpen));
+  };
+
+  openButton?.addEventListener('click', () => setMenuState(true));
+  closeButton?.addEventListener('click', () => setMenuState(false));
+  menu?.addEventListener('click', (event) => {
+    if (event.target === menu) setMenuState(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setMenuState(false);
+  });
+</script>

@@ -58,7 +58,7 @@ const posts = allPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
   description="All posts, newest first."
 >
   <div class="center">
-    <div class="flex items-center gap-8">
+    <div class="flex flex-wrap items-center gap-4 sm:gap-8">
       <a href="/archive/" class="heading">Archive</a>
       <YearFilter years={years} />
     </div>

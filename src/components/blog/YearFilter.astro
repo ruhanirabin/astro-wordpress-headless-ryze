@@ -4,20 +4,46 @@ interface Props {
 }
 
 const { years } = Astro.props;
+const path = Astro.url.pathname;
+const yearMatch = path.match(/\/archive\/(\d{4})/);
+const currentYear = yearMatch?.[1] ?? "all";
 ---
 
-<div class="flex flex-wrap gap-3 pt-3">
-  {years.map((year: string) => (
-    <a
-      href={`/archive/${year}`}
-      class:list={[
-        "button animation",
-        Astro.url.pathname.startsWith(`/archive/${year}`)
-          ? "text-background bg-accent font-semibold"
-          : "",
-      ]}
-    >
-      {year}
-    </a>
-  ))}
+<div class="flex items-center gap-3">
+  <div class="sm:hidden w-40">
+    <label for="year-select" class="sr-only">Select year</label>
+    <select id="year-select" class="year-select w-full">
+      <option value="/archive/" selected={currentYear === "all"}>All years</option>
+      {years.map((year: string) => (
+        <option value={`/archive/${year}`} selected={currentYear === year}>
+          {year}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  <div class="hidden sm:flex flex-wrap gap-3 pt-3">
+    {years.map((year: string) => (
+      <a
+        href={`/archive/${year}`}
+        class:list={[
+          "button animation",
+          Astro.url.pathname.startsWith(`/archive/${year}`)
+            ? "text-background bg-accent font-semibold"
+            : "",
+        ]}
+      >
+        {year}
+      </a>
+    ))}
+  </div>
 </div>
+
+<script is:inline>
+  const yearSelect = document.getElementById('year-select');
+  yearSelect?.addEventListener('change', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLSelectElement)) return;
+    if (target.value) window.location.href = target.value;
+  });
+</script>

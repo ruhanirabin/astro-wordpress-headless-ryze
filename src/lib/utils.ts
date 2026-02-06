@@ -45,6 +45,20 @@ export function stripHtml(html: string): string {
 }
 
 /**
+ * Decode basic HTML entities in text
+ */
+export function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, num) => String.fromCharCode(parseInt(num, 10)))
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+/**
  * Truncate text to a specified length
  */
 export function truncateText(text: string, maxLength: number, suffix: string = '...'): string {

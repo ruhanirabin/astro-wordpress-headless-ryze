@@ -1,20 +1,79 @@
 ---
+import { getAllCategories } from "../../lib/wordpress";
 
+const categories = (await getAllCategories())
+  .filter((category) => category.slug !== "uncategorized")
+  .sort((a, b) => a.name.localeCompare(b.name));
 ---
 
-<nav class="flex items-center justify-center gap-4">
-  <a
-    href="/archive/"
-    class:list={[
-      "navigation animation",
-      Astro.url.pathname.startsWith("/archive") ? "text-accent" : "",
-    ]}>archive</a
-  >
-  <a
-    href="/about-me"
-    class:list={[
-      "navigation animation",
-      Astro.url.pathname.startsWith("/about") ? "text-accent" : "",
-    ]}>about</a
-  >
+<nav class="flex items-center justify-center gap-4 mobile-menu-nav">
+  <details class="nav-dropdown">
+    <summary
+      class:list={[
+        "nav-summary",
+        Astro.url.pathname.startsWith("/archive") ? "text-accent" : "",
+      ]}
+      aria-haspopup="true"
+    >
+      archive
+    </summary>
+    <div class="nav-panel" role="menu">
+      <a href="/archive/" class="nav-link" role="menuitem">all posts</a>
+      {categories.map((category) => (
+        <a
+          href={`/category/${category.slug}/`}
+          class="nav-link"
+          role="menuitem"
+        >
+          {category.name}
+        </a>
+      ))}
+    </div>
+  </details>
+
+  <details class="nav-dropdown">
+    <summary
+      class:list={[
+        "nav-summary",
+        Astro.url.pathname.startsWith("/about") ? "text-accent" : "",
+      ]}
+      aria-haspopup="true"
+    >
+      pages
+    </summary>
+    <div class="nav-panel" role="menu">
+      <a href="/about-me" class="nav-link" role="menuitem">about me</a>
+    </div>
+  </details>
 </nav>
+
+<script is:inline>
+  (() => {
+    if (window.__navDropdownInit) return;
+    window.__navDropdownInit = true;
+
+    const dropdowns = document.querySelectorAll('.nav-dropdown');
+
+    dropdowns.forEach((dropdown) => {
+      dropdown.addEventListener('toggle', () => {
+        if (!dropdown.open) return;
+        dropdowns.forEach((other) => {
+          if (other !== dropdown) other.removeAttribute('open');
+        });
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      dropdowns.forEach((dropdown) => {
+        if (!dropdown.contains(event.target)) {
+          dropdown.removeAttribute('open');
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      dropdowns.forEach((dropdown) => dropdown.removeAttribute('open'));
+    });
+  })();
+</script>

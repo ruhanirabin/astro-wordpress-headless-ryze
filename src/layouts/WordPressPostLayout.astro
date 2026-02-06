@@ -11,6 +11,9 @@ interface Props {
   modifiedDate?: string;
   readTime: number;
   categories?: WordPressCategory[];
+  relatedPosts?: { title: string; slug: string }[];
+  previousPost?: { title: string; slug: string } | null;
+  nextPost?: { title: string; slug: string } | null;
   featuredImage?: {
     url: string;
     alt: string;
@@ -20,7 +23,18 @@ interface Props {
   } | null;
 }
 
-const { title, description, date, modifiedDate, readTime, categories, featuredImage } = Astro.props;
+const {
+  title,
+  description,
+  date,
+  modifiedDate,
+  readTime,
+  categories,
+  featuredImage,
+  relatedPosts = [],
+  previousPost,
+  nextPost,
+} = Astro.props;
 
 // Extract category names for SEO
 const categoryNames = categories?.map(cat => cat.name) || [];
@@ -100,6 +114,50 @@ const categoryNames = categories?.map(cat => cat.name) || [];
       <section class="markdown wordpress-content">
         <slot />
       </section>
+      {(relatedPosts.length > 0 || previousPost || nextPost) && (
+        <div class="mt-10 space-y-6">
+          {relatedPosts.length > 0 && (
+            <div class="space-y-2">
+              <div class="text-xs uppercase tracking-[0.18em] text-foreground/50">
+                Related posts
+              </div>
+              <ul class="space-y-1 text-sm">
+                {relatedPosts.map((related) => (
+                  <li>
+                    <a class="link" href={`/${related.slug}/`}>
+                      {related.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {(previousPost || nextPost) && (
+            <div class="grid gap-4 text-sm sm:grid-cols-2">
+              <div>
+                {previousPost && (
+                  <a class="link block" href={`/${previousPost.slug}/`}>
+                    <div class="text-xs uppercase tracking-[0.18em] text-foreground/50">
+                      Previous
+                    </div>
+                    <div class="mt-1">{previousPost.title}</div>
+                  </a>
+                )}
+              </div>
+              <div class="sm:text-right">
+                {nextPost && (
+                  <a class="link block" href={`/${nextPost.slug}/`}>
+                    <div class="text-xs uppercase tracking-[0.18em] text-foreground/50">
+                      Next
+                    </div>
+                    <div class="mt-1">{nextPost.title}</div>
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   </article>
 </BaseLayout>
@@ -114,32 +172,44 @@ const categoryNames = categories?.map(cat => cat.name) || [];
     if (!code) return;
 
     const text = code.textContent || "";
-    const lineCount = text.trim().split("\n").length;
-    if (lineCount < 2) return;
-
     pre.style.position = "relative";
 
     const button = document.createElement("button");
     button.type = "button";
     button.className =
-      "code-copy inline-flex items-center justify-center size-9 rounded-md bg-background/80 ring-1 ring-foreground/20 text-foreground text-xs";
+      "code-copy inline-flex items-center justify-center size-9 rounded-md bg-background/80 ring-1 ring-foreground/20 text-foreground";
     button.setAttribute("aria-label", "Copy code");
-    button.textContent = "Copy";
+    button.innerHTML = `
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="size-4">
+        <path
+          fill="currentColor"
+          d="M16 1H6a2 2 0 0 0-2 2v12h2V3h10V1zm3 4H10a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H10V7h9v14z"
+        />
+      </svg>
+      <span class="code-copy-text" aria-live="polite"></span>
+      <span class="sr-only">Copy code</span>
+    `;
     button.style.position = "absolute";
     button.style.top = "0.75rem";
     button.style.right = "0.75rem";
 
     button.addEventListener("click", async () => {
+      const activeClasses = ["code-copy-active"];
+      const textEl = button.querySelector(".code-copy-text");
       try {
         await navigator.clipboard.writeText(text);
-        button.textContent = "Copied";
+        button.classList.add(...activeClasses);
+        if (textEl) textEl.textContent = "Copied";
         setTimeout(() => {
-          button.textContent = "Copy";
+          button.classList.remove(...activeClasses);
+          if (textEl) textEl.textContent = "";
         }, 1200);
       } catch {
-        button.textContent = "Failed";
+        button.classList.add(...activeClasses);
+        if (textEl) textEl.textContent = "Failed";
         setTimeout(() => {
-          button.textContent = "Copy";
+          button.classList.remove(...activeClasses);
+          if (textEl) textEl.textContent = "";
         }, 1200);
       }
     });
