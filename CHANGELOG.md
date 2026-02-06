@@ -1,7 +1,5 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
 ## 2026-02-06
 - feat: Add a mobile slide-out menu for easier navigation.
 - feat: Add category-based archive navigation and a Pages menu.
@@ -9,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - feat: Add related posts and previous/next navigation on articles.
 - improve: Make code copy buttons clearer with icon and feedback text.
 - feat: Add a floating back-to-top button that appears on scroll.
+- improve: Improve mobile menu accessibility with dialog semantics and focus handling.
 
 ## 2026-02-05
 - improve: Switch code font to JetBrains Mono for clearer reading.
