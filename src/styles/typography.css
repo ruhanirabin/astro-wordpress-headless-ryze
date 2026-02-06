@@ -234,7 +234,7 @@
     
     /* WordPress images don't need the ring by default */
     img {
-      @apply ring-0 rounded-lg;
+      @apply ring-accent ring-1 rounded-lg;
     }
     
     /* WordPress figure captions */

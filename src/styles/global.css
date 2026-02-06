@@ -297,7 +297,7 @@ figure img {
 }
 
 .wp-block-embed__wrapper iframe {
-  @apply absolute inset-0 w-full h-full;
+  @apply absolute inset-0 w-full h-full ring-accent ring-1;
 }
 
 /* ============================================
