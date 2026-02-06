@@ -1,10 +1,8 @@
 # Contributing Guide
 
-Thanks for considering a contribution! This project is a headless WordPress + Astro site based on the Ryze theme. 
+Thanks for considering a contribution! This project is a headless WordPress + Astro site based on the Ryze theme.
 
-This is a template so you can use it to build your own site. Do not submit pull requests to this repo. Instead, fork it and make your changes there.
-
-## Fork Quick Start
+## Quick Start
 
 1. Fork the repo and create a feature branch.
 2. Install dependencies:
@@ -25,6 +23,24 @@ cp .env.example .env
 npm run dev
 ```
 
+## Code Style
+
+- Use the existing formatting (Prettier config).
+- Prefer small, focused commits.
+- Keep UI changes consistent with the Ryze‑style layout.
+
+## Pull Request Checklist
+
+- [ ] Clear description of the change
+- [ ] Screenshots for UI changes (desktop + mobile)
+- [ ] No secrets in commits or `.env`
+- [ ] Tested locally (`npm run dev` or `npm run build`)
+
+## Where to Start
+
+- Small UI tweaks and bug fixes are welcome
+- Documentation improvements are appreciated
+- For large changes, open an issue first
 
 ## Security
 
