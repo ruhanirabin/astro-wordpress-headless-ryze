@@ -156,6 +156,7 @@ Netlify will build and deploy automatically when WordPress content changes.
 
 You can use the code snippet below to trigger a rebuild when WordPress content changes.
 
+[WordPress Code](wp-addon/netlify-build-trigger-on-post-events.php)
 
 
 ## Commands
