@@ -3,21 +3,23 @@
  * Netlify Build Trigger on Post Events
  *
  * Triggers a Netlify build webhook when posts are saved, deleted, or published.
- * Prevents duplicate triggers within the same request. Install this snippet in your 
- * WordPress site to automatically rebuild your Netlify site whenever content changes.
- * Use: WPCodeBox, Fluent Snippets, or similar plugin to add this code.
+ * Prevents duplicate triggers within the same request.
  *
  * @package     WordPress
  * @subpackage  Code Snippets
  * @author      Ruhani Rabin
  * @link        https://www.ruhanirabin.com/code-snippet/
- * @version     1.1.0
+ * @version     1.2.0
  *
  * Changelog:
- * 1.1.0 - 2025-02-01
+ * 1.2.0 - 2026-02-09
+ * - Added restriction to only trigger on published posts
+ * - Prevents triggering on draft, pending, or other non-published statuses
+ * 
+ * 1.1.0 - 2026-02-02
  * - Moved webhook URL to a constant for easy configuration across sites
  * 
- * 1.0.0 - 2025-02-01
+ * 1.0.0 - 2026-02-01
  * - Initial release
  * - Added support for post save, delete, and publish events
  * - Implemented duplicate trigger prevention
@@ -38,7 +40,7 @@ if (!defined('ABSPATH')) {
  * 2. Navigate to Site settings > Build & deploy > Build hooks
  * 3. Create a new build hook and copy the URL
  */
-define('NETLIFY_BUILD_HOOK_URL', 'https://api.netlify.com/build_hooks/CHANGE_THIS_TO_YOUR_HOOK_ID');
+define('NETLIFY_BUILD_HOOK_URL', 'https://api.netlify.com/build_hooks/YOUR-BUILD-HOOK-ID-HERE');
 
 class Netlify_Build_Trigger {
     
@@ -97,8 +99,8 @@ class Netlify_Build_Trigger {
             return;
         }
         
-        // Only trigger on manual saves (not auto-drafts)
-        if ($post->post_status === 'auto-draft') {
+        // Only trigger if post status is published
+        if ($post->post_status !== 'publish') {
             return;
         }
         
@@ -119,6 +121,11 @@ class Netlify_Build_Trigger {
         
         // Only trigger for posts
         if ($post->post_type !== 'post') {
+            return;
+        }
+        
+        // Only trigger if the deleted post was published
+        if ($post->post_status !== 'publish') {
             return;
         }
         

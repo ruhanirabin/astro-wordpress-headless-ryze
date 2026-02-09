@@ -2,6 +2,7 @@
 
 ## 2026-02-09
 - feat: Add a WordPress snippet to trigger Netlify builds when posts are saved, published, or deleted.
+- fix: Only trigger Netlify builds for published posts to avoid draft and pending updates.
 
 ## 2026-02-06
 - feat: Add a mobile slide-out menu for easier navigation.
@@ -21,3 +22,4 @@
 - fix: Stabilize code highlighting by reverting to a reliable CDN source.
 - fix: Correct footer link behavior.
 - feat: Add a simple About page.
+
